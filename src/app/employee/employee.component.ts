@@ -76,7 +76,7 @@ export class EmployeeComponent implements OnInit {
 
   // Load team lead name from backend (simulated)
   private loadTeamLeadDetails(employeeId: string): void {
-    this.http.get<any>(`https://192.168.0.22:8243/employee/api/${employeeId}`)
+    this.http.get<any>(`jdbc:postgresql://dpg-d65hqnu3jp1c73ar8o0g-a.singapore-postgres.render.com/rumango/employee/api/${employeeId}`)
       .subscribe({
         next: (res) => {
           this.teamLeadName = res.employeeName || 'Unknown TL';
@@ -91,7 +91,7 @@ export class EmployeeComponent implements OnInit {
   // Handle date save - fetch employees data
   onDateSave(): void {
     if (this.selectedDate && this.teamLeadId) {
-    this.http.get<Employee[]>(`https://192.168.0.22:8243/employee/api/v1/tasks/by-date?date=${this.selectedDate}&employeeId=${this.teamLeadId}`)
+    this.http.get<Employee[]>(`jdbc:postgresql://dpg-d65hqnu3jp1c73ar8o0g-a.singapore-postgres.render.com/rumango/employee/api/v1/tasks/by-date?date=${this.selectedDate}&employeeId=${this.teamLeadId}`)
       .subscribe({
         next: (res) => {
           // Store only taskId + taskName initially
@@ -132,7 +132,7 @@ onTaskSelect(employeeId: string, task: Task): void {
 
   // ✅ Build API URL
   if (this.selectedDate && task.name) {
-    const url = `https://192.168.0.22:8243/employee/rating/getTasks?taskNames=${encodeURIComponent(task.name)}&employeeId=${employeeId}&workDate=${this.selectedDate}`;
+    const url = `jdbc:postgresql://dpg-d65hqnu3jp1c73ar8o0g-a.singapore-postgres.render.com/rumango/employee/rating/getTasks?taskNames=${encodeURIComponent(task.name)}&employeeId=${employeeId}&workDate=${this.selectedDate}`;
 
     this.http.get<any>(url).subscribe({
       next: (res) => {
@@ -234,7 +234,7 @@ onSubmit(): void {
     'Content-Type': 'application/json'
   });
  
-  this.http.post('https://192.168.0.22:8243/employee/rating/submit', submissionData, { headers })
+  this.http.post('jdbc:postgresql://dpg-d65hqnu3jp1c73ar8o0g-a.singapore-postgres.render.com/rumango/employee/rating/submit', submissionData, { headers })
     .subscribe({
       next: () => {
         this.showCustomAlert('Data submitted successfully!');
