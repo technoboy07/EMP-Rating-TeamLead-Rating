@@ -113,15 +113,20 @@ export class EmployeeComponent implements OnInit {
 
   // Handle date save - fetch employees data
   onDateSave(): void {
-    if (this.selectedDate && this.teamLeadId) {
-    this.http.get<Employee[]>(`https://emp-rating-backend.onrender.com/api/v1/tasks/by-date?date=${this.selectedDate}&employeeId=${this.teamLeadId}`)
+    if (!this.selectedDate || !this.teamLeadName) {
+      console.warn('Missing date or teamLeadName');
+      return;
+    }
+  
+    const encodedName = encodeURIComponent(this.teamLeadName);
+  
+    this.http.get<Employee[]>(`https://emp-rating-backend.onrender.com/api/v1/tasks/by-date-tlname?date=${this.selectedDate}&teamLeadName=${encodedName}`)
       .subscribe({
         next: (res) => {
-          // Store only taskId + taskName initially
           this.employees = res.map(emp => ({
             ...emp,
             tasks: (emp.tasks as unknown as string[]).map((taskName, index) => ({
-              id: `${emp.employeeId}-${index}`, // temporary/fake id
+              id: `${emp.employeeId}-${index}`, // still a local id for UI
               name: taskName
             }))
           }));
@@ -132,7 +137,7 @@ export class EmployeeComponent implements OnInit {
         }
       });
   }
-}
+
   // Toggle dropdown for task selection
   toggleDropdown(employeeId: string): void {
     this.dropdownOpen[employeeId] = !this.dropdownOpen[employeeId];
