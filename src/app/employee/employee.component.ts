@@ -45,7 +45,7 @@ export class EmployeeComponent implements OnInit {
   remarks: { [key: string]: string } = {};
   dropdownOpen: { [key: string]: boolean } = {};
   employeeForm: any;
-
+  selectedTasks: { [key: string]: Task } = {}; 
   alertMessage: string = '';
   showAlert: boolean = false;
 
@@ -152,38 +152,12 @@ export class EmployeeComponent implements OnInit {
 
 
   // Handle task selection
-onTaskSelect(employeeId: string, task: Task): void {
-  // Show modal immediately
-  this.selectedTask = { ...task, employeeId } as Task & { employeeId: string };
-  this.showTaskModal = true;
-  this.dropdownOpen[employeeId] = false;
-
-  // ✅ Build API URL
-  if (this.selectedDate && task.name) {
-    const url = `https://emp-rating-backend.onrender.com/rating/getTasks?taskNames=${encodeURIComponent(task.name)}&employeeId=${employeeId}&workDate=${this.selectedDate}`;
-
-    this.http.get<any>(url).subscribe({
-      next: (res) => {
-        // ✅ Map backend response into Task object
-        this.selectedTask = {
-          id: String(res.id),           // backend gives number → convert to string
-          name: res.task,               // backend returns "task"
-          description: res.description,
-          prLink: res.prLink,
-          status: res.status,
-          hours: res.hours,
-          extraHours: res.extraHours,
-          employeeId
-        } as Task & { employeeId: string };
-      },
-      error: (err) => {
-        console.error('Error fetching task details:', err);
-      }
-    });
-  } else {
-    console.warn('⚠️ selectedDate or task.name missing!');
+  onTaskSelect(employeeId: string, task: Task): void {
+    // Just select the task (store it, update button text, close dropdown)
+    this.selectedTasks[employeeId] = task;
+    this.dropdownOpen[employeeId] = false;
   }
-}
+  
 
 
   // Close task modal
@@ -198,12 +172,12 @@ onRatingChange(employeeId: string, rating: any): void {
 }
 
   // Handle remark change
-  onRemarkChange(employeeId: string, event: Event): void {
-    const target = event.target as HTMLInputElement;
-    if (target) {
-      this.remarks[employeeId] = target.value;
-    }
+onRemarkChange(employeeId: string, event: Event): void {
+  const target = event.target as HTMLInputElement;
+  if (target) {
+    this.remarks[employeeId] = target.value;
   }
+}
 
 // Get rating for employee
 getRating(employeeId: string): number | '' {
@@ -230,12 +204,12 @@ getRating(employeeId: string): number | '' {
     }
   }
 
-  // Reset form
   onReset(): void {
     this.selectedDate = '';
     this.employees = [];
     this.ratings = {};
     this.remarks = {};
+    this.selectedTasks = {}; // Add this line
     this.selectedTask = null;
     this.showTaskModal = false;
     this.dropdownOpen = {};
@@ -281,11 +255,66 @@ onSubmit(): void {
       window.location.href = 'https://login-ivory-tau.vercel.app/';
     });
   }
+  
+  getSelectedTaskName(employeeId: string): string {
+    return this.selectedTasks[employeeId]?.name || '';
+  }
 
+  formatTime(time: any): string {
+    if (!time) return 'N/A';
+    if (typeof time === 'string') return time;
+    if (typeof time === 'object' && 'hour' in time && 'minute' in time) {
+      return `${String(time.hour).padStart(2, '0')}:${String(time.minute).padStart(2, '0')}`;
+    }
+    return String(time);
+  }
+  
   // Check if form is valid for submission
   isFormValid(): boolean {
     return this.selectedDate !== '' && this.employees.length > 0;
   }
+// Add this new method to view task details (opens modal)
+viewTaskDetails(employeeId: string, task: Task): void {
+  // Prevent dropdown from closing when clicking info icon
+  event?.stopPropagation();
+  
+  // Show modal and load full task details
+  this.selectedTask = { ...task, employeeId } as Task & { employeeId: string };
+  this.showTaskModal = true;
+
+  // Fetch full task details from backend
+  if (this.selectedDate && task.name) {
+    const url = `https://emp-rating-backend.onrender.com/rating/getTasks?taskNames=${encodeURIComponent(task.name)}&employeeId=${employeeId}&workDate=${this.selectedDate}`;
+
+    this.http.get<any>(url).subscribe({
+      next: (res) => {
+        if (!res || !res.id) {
+          this.showCustomAlert('Task details not found');
+          this.closeTaskModal();
+          return;
+        }
+        // Map backend response into Task object
+        this.selectedTask = {
+          id: String(res.id),
+          name: res.task,
+          description: res.description || 'No description provided',
+          prLink: res.prLink || '',
+          status: res.status || 'Unknown',
+          hours: res.hours,
+          extraHours: res.extraHours,
+          employeeId
+        } as Task & { employeeId: string };
+      },
+      error: (err) => {
+        console.error('Error fetching task details:', err);
+        this.showCustomAlert('Failed to load task details. Please try again.');
+        this.closeTaskModal();
+      }
+    });
+  } else {
+    console.warn('⚠️ selectedDate or task.name missing!');
+  }
+}
 
    // --- Custom Alert Methods ---
   showCustomAlert(message: string): void {

@@ -66,7 +66,6 @@
   <!-- Container 3: Employee Table -->
   <div class="container employee-table" *ngIf="employees.length > 0">
     <h2 class="container-title">
-
       Employee Evaluation
     </h2>
     
@@ -91,20 +90,31 @@
                   class="dropdown-btn" 
                   (click)="toggleDropdown(employee.employeeId)"
                 >
-                  Select Task
+                  {{ getSelectedTaskName(employee.employeeId) || 'Select Task' }}
                   <span class="dropdown-arrow">▼</span>
                 </button>
                 <div 
                   class="dropdown-menu" 
                   *ngIf="dropdownOpen[employee.employeeId]"
                 >
-                  <button 
+                  <div 
                     *ngFor="let task of employee.tasks"
-                    class="dropdown-item"
-                    (click)="onTaskSelect(employee.employeeId, task)"
+                    class="dropdown-item-wrapper"
                   >
-                    {{ task.name }}
-                  </button>
+                    <button 
+                      class="dropdown-item"
+                      (click)="onTaskSelect(employee.employeeId, task)"
+                    >
+                      {{ task.name }}
+                    </button>
+                    <button 
+                      class="info-icon-btn"
+                      (click)="viewTaskDetails(employee.employeeId, task)"
+                      title="View task details"
+                    >
+                      ℹ️
+                    </button>
+                  </div>
                 </div>
               </div>
             </td>
@@ -135,7 +145,6 @@
     <!-- Action Buttons -->
     <div class="action-buttons">
       <button class="btn btn-secondary" (click)="onReset()">
-        
         Reset
       </button>
       <button 
@@ -143,7 +152,6 @@
         (click)="onSubmit()" 
         [disabled]="!isFormValid()"
       >
-  
         Submit
       </button>
     </div>
@@ -156,6 +164,7 @@
     <div class="modal-header">
       <h3 class="modal-title">Task Details</h3>
       <button class="close-btn" (click)="closeTaskModal()">
+        <span class="close-icon">✕</span>
       </button>
     </div>
     
@@ -165,36 +174,35 @@
         <p class="detail-value">{{ selectedTask.name }}</p>
       </div>
       <div class="detail-row">
-  <span class="detail-label">PR Link:</span>
-  <p class="detail-value">
-    <a *ngIf="selectedTask.prLink" [href]="selectedTask.prLink" target="_blank">
-      {{ selectedTask.prLink }}
-    </a>
-  </p>
-</div>
-
+        <span class="detail-label">PR Link:</span>
+        <p class="detail-value">
+          <a *ngIf="selectedTask.prLink" [href]="selectedTask.prLink" target="_blank">
+            {{ selectedTask.prLink }}
+          </a>
+          <span *ngIf="!selectedTask.prLink">No PR link provided</span>
+        </p>
+      </div>
       <div class="detail-row">
         <span class="detail-label">Description:</span>
-        <p class="detail-value">{{ selectedTask.description }}</p>
+        <p class="detail-value">{{ selectedTask.description || 'No description provided' }}</p>
       </div>
       <div class="detail-row">
         <span class="detail-label">Status:</span>
         <span class="status-badge" [ngClass]="getStatusClass(selectedTask.status || '')">
-          {{ selectedTask.status }}
+          {{ selectedTask.status || 'Unknown' }}
         </span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Hours:</span>
-        <p class="detail-value">{{ selectedTask.hours }}</p>
+        <p class="detail-value">{{ formatTime(selectedTask.hours) }}</p>
       </div>
       <div class="detail-row">
         <span class="detail-label">Extra Hours:</span>
-        <p class="detail-value">{{ selectedTask.extraHours }}</p>
+        <p class="detail-value">{{ formatTime(selectedTask.extraHours) }}</p>
       </div>
     </div>
   </div>
 </div>
-
 
 <!-- ✅ Custom Alert Modal -->
 <div *ngIf="showAlert" class="custom-alert-overlay">
