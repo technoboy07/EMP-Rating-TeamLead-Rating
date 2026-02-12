@@ -80,13 +80,6 @@ body {
   color: #2563eb;
 }
 
-/* Icons (using CSS pseudo-elements for simplicity) */
-.icon-user::before { content: "👤"; }
-.icon-calendar::before { content: "📅"; }
-.icon-users::before { content: "👥"; }
-.icon-reset::before { content: "🔄"; }
-.icon-submit::before { content: "📤"; }
-.icon-exit::before { content: "🚪"; }
 
 /* Form Styles */
 .form-grid {
@@ -141,6 +134,7 @@ body {
 
 .save-btn {
   margin-top: 1.5rem;
+  background-color: #f0630b;
 }
 
 /* Button Styles */
