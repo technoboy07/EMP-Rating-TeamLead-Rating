@@ -521,6 +521,7 @@ body {
   margin-left: auto;
   margin-right: auto;
   width: 200px; /* normal size on larger screens */
+  background-color: #ac1717;
 }
 
 /* On smaller screens, make Exit full width like Search */

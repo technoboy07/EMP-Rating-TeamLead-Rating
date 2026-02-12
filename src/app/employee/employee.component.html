@@ -11,7 +11,6 @@
   <!-- Container 1: Team Lead Information -->
   <div class="container team-lead-info">
     <h2 class="container-title">
-      <i class="icon-user"></i>
       Team Lead Information
     </h2>
     <div class="form-grid">
@@ -39,7 +38,6 @@
   <!-- Container 2: Date Selection -->
   <div class="container date-selection">
     <h2 class="container-title">
-      <i class="icon-calendar"></i>
       Date Selection
     </h2>
     <div class="date-container">
@@ -61,7 +59,6 @@
     </div>
 
    <button class="btn btn-danger exit-btn" (click)="onExit()">
-    <i class="icon-exit"></i>
     Exit
   </button>
   </div>
@@ -69,7 +66,7 @@
   <!-- Container 3: Employee Table -->
   <div class="container employee-table" *ngIf="employees.length > 0">
     <h2 class="container-title">
-      <i class="icon-users"></i>
+
       Employee Evaluation
     </h2>
     
@@ -138,7 +135,7 @@
     <!-- Action Buttons -->
     <div class="action-buttons">
       <button class="btn btn-secondary" (click)="onReset()">
-        <i class="icon-reset"></i>
+        
         Reset
       </button>
       <button 
@@ -146,7 +143,7 @@
         (click)="onSubmit()" 
         [disabled]="!isFormValid()"
       >
-        <i class="icon-submit"></i>
+  
         Submit
       </button>
     </div>
@@ -159,7 +156,6 @@
     <div class="modal-header">
       <h3 class="modal-title">Task Details</h3>
       <button class="close-btn" (click)="closeTaskModal()">
-        <span class="close-icon">✕</span>
       </button>
     </div>
     
